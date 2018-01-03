@@ -1,0 +1,5 @@
+all:
+  children:
+    repo_syslog-ng:
+      hosts:
+        cent03:

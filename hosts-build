@@ -1,0 +1,3 @@
+all:
+  hosts:
+    cent03:

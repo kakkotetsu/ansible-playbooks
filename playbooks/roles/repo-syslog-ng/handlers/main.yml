@@ -1,0 +1,13 @@
+- name: check config syslog-ng
+  become: true
+  become_user: root
+  command: 'syslog-ng -s'
+  changed_when: false
+  listen: check and reload syslog-ng
+- name: reload syslog-ng
+  become: true
+  become_user: root
+  systemd:
+    state: reloaded
+    name: syslog-ng
+  listen: check and reload syslog-ng

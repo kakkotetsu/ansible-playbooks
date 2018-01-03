@@ -1,0 +1,5 @@
+- name: repo_syslog-ng
+  hosts: repo_syslog-ng
+  remote_user: kotetsu
+  roles:
+    - repo-syslog-ng

@@ -1,0 +1,30 @@
+- name: create partition (parted)
+  become: true
+  become_user: root
+  parted:
+    device: /dev/vdb
+    number: 1
+    state: present
+- name: create filesystem (mkfs)
+  become: true
+  become_user: root
+  filesystem:
+    fstype: xfs
+    dev: /dev/vdb1
+- name: create directory (mkdir)
+  become: true
+  become_user: root
+  file:
+    path: /var/data
+    state: directory
+    mode: 0775
+    owner: kotetsu
+    group: kotetsu
+- name: mount
+  become: true
+  become_user: root
+  mount:
+    path: /var/data
+    src: /dev/vdb1
+    fstype: xfs
+    state: mounted

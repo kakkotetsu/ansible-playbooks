@@ -1,0 +1,5 @@
+- name: build_disk
+  hosts: all
+  remote_user: kotetsu
+  roles:
+    - build_disk

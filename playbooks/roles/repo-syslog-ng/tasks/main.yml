@@ -1,0 +1,7 @@
+- name: git check & pull
+  git:
+    repo: 'ssh://cent01/var/data/syslog-ng.git'
+    dest: '/etc/syslog-ng'
+    update: yes
+    force: yes
+  notify: check and reload syslog-ng
