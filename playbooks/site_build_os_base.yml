@@ -1,0 +1,7 @@
+- name: OS base config
+  hosts: all
+  remote_user: kotetsu
+  roles:
+    - build_disk
+    - build_base_pkg
+    - build_local_users

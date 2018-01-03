@@ -1,0 +1,53 @@
+- name: yum install base packages
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - vim
+    - git
+    - epel-release
+    - etckeeper
+# see. https://www.python.jp/install/centos/index.html
+- name: add IUS repository for Python3.X
+  become: true
+  become_user: root
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+    state: installed
+# see. https://www.python.jp/install/centos/index.html
+- name: yum install Python3.6
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - python36u
+    - python36u-devel
+    - python36u-pip
+- name: yum -y update
+  become: true
+  become_user: root
+  yum:
+    name: '*'
+    state: latest
+# /etc/gitconfig
+- name: git config --system color.ui true
+  become: true
+  become_user: root
+  git_config:
+    name: color.ui
+    scope: system
+    value: auto
+# Make etckeeper not complain when invoked by cron
+# /etc/.git/config
+- name: git config --local(/etc)  user.email for etckeeper
+  become: true
+  become_user: root
+  git_config:
+    name: user.email
+    repo: /etc
+    scope: local
+    value: 'root@{{ ansible_fqdn }}'
