@@ -1,0 +1,29 @@
+- name: yum install net-snmp, net-snmp-utils
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - net-snmp
+    - net-snmp-utils
+
+- name: copy snmpd.conf
+  become: true
+  become_user: root
+  template:
+    src: snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart snmpd
+
+- name: systemctl enable,start snmpd
+  become: true
+  become_user: root
+  systemd:
+    name: snmpd
+    state: started
+    enabled: yes

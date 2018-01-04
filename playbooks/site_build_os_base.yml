@@ -5,3 +5,4 @@
     - build_disk
     - build_base_pkg
     - build_local_users
+    - build_snmpd
