@@ -1,0 +1,60 @@
+#
+# install ruby with rbenv/ruby-build
+#  see. 
+#    https://github.com/rbenv/rbenv
+#    https://github.com/rbenv/ruby-build/wiki
+#
+- name: git pull ruby-build repository
+  become: true
+  become_user: root
+  git:
+    repo: 'https://github.com/rbenv/ruby-build.git'
+    dest: /opt/rbenv/plugins/ruby-build
+    update: yes
+  tags:
+    - ruby-install
+
+- name: check {{ ruby_install_version }} installed?
+  become: true
+  become_user: root
+  command: 'bash -lc "rbenv versions"'
+  register: ruby_installed_versions
+  changed_when: false
+  failed_when: false # e.x.) rc=1 Warning: no Ruby detected on the system 
+  tags:
+    - ruby-install
+
+- name: install ruby {{ ruby_install_version }}
+  become: true
+  become_user: root
+  command: 'bash -lc "rbenv install {{ ruby_install_version }}"'
+  when: 'ruby_install_version not in ruby_installed_versions.stdout'
+  tags:
+    - ruby-install
+
+- name: rbenv rehash
+  become: true
+  become_user: root
+  command: 'bash -lc "rbenv rehash"'
+  when: 'ruby_install_version not in ruby_installed_versions.stdout'
+  tags:
+    - ruby-install
+
+- name: rbenv global {{ ruby_install_version }}
+  become: true
+  become_user: root
+  command: 'bash -lc "rbenv global {{ ruby_install_version }}"'
+  when: 'ruby_install_version not in ruby_installed_versions.stdout'
+  tags:
+    - ruby-install
+
+- name: gem install bundler
+  become: true
+  become_user: root
+  gem:
+    name: bundler
+    state: latest
+    executable: /opt/rbenv/shims/gem
+    user_install: no
+  tags:
+    - ruby-install

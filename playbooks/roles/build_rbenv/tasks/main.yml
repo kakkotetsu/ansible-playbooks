@@ -1,0 +1,80 @@
+#
+# install rbenv
+#  see. 
+#    https://github.com/rbenv/rbenv
+#    https://github.com/rbenv/ruby-build/wiki
+#
+- name: git clone rbenv repository
+  become: true
+  become_user: root
+  git:
+    repo: 'https://github.com/rbenv/rbenv.git'
+    dest: /opt/rbenv
+    update: no
+  tags:
+    - rbenv
+
+- name: chown & chmod /opt/rbenv for /etc/profile.d/rbenv.sh
+  become: true
+  become_user: root
+  file:
+    path: /opt/rbenv
+    state: directory
+    mode: 0777
+    owner: root
+    group: root
+  tags:
+    - rbenv
+
+- name: copy /etc/profile.d/rbenv.sh
+  become: true
+  become_user: root
+  template:
+    src: rbenv.sh.j2
+    dest: /etc/profile.d/rbenv.sh
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - rbenv
+
+- name: mkdir /opt/rbenv/plugins for ruby-build
+  become: true
+  become_user: root
+  file:
+    path: /opt/rbenv/plugins
+    state: directory
+    mode: 0775
+    owner: kotetsu
+    group: kotetsu
+  tags:
+    - rbenv
+
+- name: git clone ruby-build repository
+  become: true
+  become_user: root
+  git:
+    repo: 'https://github.com/rbenv/ruby-build.git'
+    dest: /opt/rbenv/plugins/ruby-build
+    update: yes
+  tags:
+    - rbenv
+
+- name: yum install dependency packages for ruby-build
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - gcc
+    - bzip2
+    - openssl-devel
+    - libyaml-devel
+    - libffi-devel
+    - readline-devel
+    - zlib-devel
+    - gdbm-devel
+    - ncurses-devel
+  tags:
+    - rbenv
