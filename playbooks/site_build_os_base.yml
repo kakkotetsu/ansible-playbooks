@@ -8,3 +8,9 @@
     - build_snmpd
     - build_rbenv
     - build_ruby
+
+- name: syslog-ng config
+  hosts: syslog-ng-servers
+  remote_user: kotetsu
+  roles:
+    - build_keepalived_syslog-ng

@@ -1,0 +1,3 @@
+keepalived_state: 'BACKUP'
+keepalived_priority: '105'
+keepalived_unicast_peer: '10.0.0.130'

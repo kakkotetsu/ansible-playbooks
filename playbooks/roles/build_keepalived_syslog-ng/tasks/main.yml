@@ -1,0 +1,32 @@
+- name: yum install keepalived
+  become: true
+  become_user: root
+  yum:
+    name: keepalived
+    state: installed
+  tags:
+    - keepalived_syslog-ng
+
+- name: copy /etc/keepalived/keepalived.conf
+  become: true
+  become_user: root
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart keepalived
+  tags:
+    - keepalived_syslog-ng
+
+- name: systemctl enable,start keepalived
+  become: true
+  become_user: root
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes
+  tags:
+    - keepalived_syslog-ng

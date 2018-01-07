@@ -3,3 +3,8 @@ all:
     127.0.0.1:
     cent02:
     cent03:
+  children:
+    syslog-ng-servers:
+      hosts:
+        cent02:
+        cent03:
