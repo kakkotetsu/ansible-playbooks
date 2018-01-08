@@ -9,6 +9,12 @@
     - build_rbenv
     - build_ruby
 
+- name: rsyslog config
+  hosts: rsyslog
+  remote_user: kotetsu
+  roles:
+    - build_rsyslog
+
 - name: syslog-ng config
   hosts: syslog-ng-servers
   remote_user: kotetsu

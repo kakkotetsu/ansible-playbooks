@@ -1,0 +1,23 @@
+- name: copy /etc/rsyslog.d/ignore-systemd-session-slice.conf
+  become: true
+  become_user: root
+  template:
+    src: ignore-systemd-session-slice.conf.j2
+    dest: /etc/rsyslog.d/ignore-systemd-session-slice.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart rsyslog
+  tags:
+    - rsyslog
+
+- name: systemctl enable,start rsyslog
+  become: true
+  become_user: root
+  systemd:
+    name: rsyslog
+    state: started
+    enabled: yes
+  tags:
+    - rsyslog

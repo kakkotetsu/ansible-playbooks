@@ -1,9 +1,12 @@
 all:
   hosts:
-    127.0.0.1:
+    cent01:
     cent02:
     cent03:
   children:
+    rsyslog:
+      hosts:
+        cent01:
     syslog-ng-servers:
       hosts:
         cent02:
