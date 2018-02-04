@@ -1,0 +1,32 @@
+- name: yum install ntp
+  become: true
+  become_user: root
+  yum:
+    name: ntp
+    state: installed
+  tags:
+    - ntpd
+
+- name: copy ntp.conf
+  become: true
+  become_user: root
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ntpd
+  tags:
+    - ntpd
+
+- name: systemctl enable,start ntpd
+  become: true
+  become_user: root
+  systemd:
+    name: ntpd
+    state: started
+    enabled: yes
+  tags:
+    - ntpd

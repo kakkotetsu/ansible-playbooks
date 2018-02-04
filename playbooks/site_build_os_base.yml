@@ -5,6 +5,7 @@
     - build_disk
     - build_base_pkg
     - build_local_users
+    - build_ntpd
     - build_snmpd
     - build_rbenv
     - build_ruby
