@@ -1,0 +1,17 @@
+- name: mysql install, initial configuration, restart
+  hosts: cacti-servers
+  remote_user: kotetsu
+  roles:
+    - build_mysql_install
+
+- name: mysql create database, user for cacti (after mysqld restart)
+  hosts: cacti-servers
+  remote_user: kotetsu
+  roles:
+    - build_mysql_cacti
+
+- name: install rrdtool {{ rrdtool_install_version }} from source
+  hosts: cacti-servers
+  remote_user: kotetsu
+  roles:
+    - build_rrdtool

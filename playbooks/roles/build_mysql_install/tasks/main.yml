@@ -1,0 +1,144 @@
+#
+# tested version:
+#   mysql : 5.7.21 MySQL Community Server (GPL)
+#   cacti : 1.X
+# see.
+#   https://docs.cacti.net/manual:100:1_installation#installation
+#   http://enog.jp/wp-content/uploads/2017/08/enog46_toyama_cacti.pdf
+#
+- name: yum remove mariadb-libs
+  become: true
+  become_user: root
+  yum:
+    name: mariadb-libs
+    state: removed
+  tags:
+    - cacti
+    - db
+
+# see.
+#   https://dev.mysql.com/downloads/repo/yum/
+#   https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/
+- name: yum repository for mysql
+  become: true
+  become_user: root
+  yum:
+    name: http://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    state: installed
+  tags:
+    - cacti
+    - db
+
+- name: yum install mysql, MySQL-python
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    enablerepo: mysql57-community
+    state: installed
+  with_items:
+    - mysql-community-server
+    - MySQL-python
+  tags:
+    - cacti
+    - db
+
+- name: systemctl enable,start mysql
+  become: true
+  become_user: root
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+  tags:
+    - cacti
+    - db
+
+- name: get temporary root password
+  become: true
+  become_user: root
+  shell: cat /var/log/mysqld.log | grep "temporary password" | awk '{ print $NF }' | head -n 1
+  register: mysql_default_password
+  changed_when: false
+  tags:
+    - cacti
+    - db
+
+- name: deploy /root/.my.cnf
+  become: true
+  become_user: root
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart mysqld
+  tags:
+    - cacti
+    - db
+
+- name: deploy /etc/my.cnf
+  become: true
+  become_user: root
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart mysqld
+  tags:
+    - cacti
+    - db
+
+- name: check mysql root password is temporary?
+  become: true
+  become_user: root
+  shell: mysqlshow -uroot -p'{{ mysql_default_password.stdout }}'
+  register: root_check
+  changed_when: false
+  failed_when: false
+  tags:
+    - cacti
+    - db
+
+- name: set mysql root password
+  become: true
+  become_user: root
+  shell: |
+    mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "SET GLOBAL validate_password_length=4;"
+    mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "SET GLOBAL validate_password_policy=LOW;"
+    mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
+  when: root_check.stderr.find('denied') == -1
+  tags:
+    - cacti
+    - db
+
+# see.
+#   https://forums.cacti.net/viewtopic.php?f=21&t=56848
+#   https://dev.mysql.com/doc/refman/5.7/en/mysql-tzinfo-to-sql.html
+- name: check mysql time_zone_name has 'Asia/Tokyo' ?
+  become: true
+  become_user: root
+  shell: echo "select Name from time_zone_name where Name = 'Asia/Tokyo';" | mysql -u root mysql | grep -Ev "^Name"
+  register: time_zone_check
+  changed_when: false
+  tags:
+    - cacti
+    - db
+
+# see.
+#   https://forums.cacti.net/viewtopic.php?f=21&t=56848
+#   https://dev.mysql.com/doc/refman/5.7/en/mysql-tzinfo-to-sql.html
+- name: mysql_tzinfo_to_sql
+  become: true
+  become_user: root
+  shell: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+  when: time_zone_check.stdout != "Asia/Tokyo"
+  tags:
+    - cacti
+    - db
+

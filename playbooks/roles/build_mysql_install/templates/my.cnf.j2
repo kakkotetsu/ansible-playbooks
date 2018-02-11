@@ -1,0 +1,46 @@
+[client]
+user = root
+password = root
+default-character-set = utf8mb4
+
+[mysqld]
+validate-password = OFF
+character-set-server = utf8mb4
+skip-character-set-client-handshake
+default-time-zone = 'Asia/Tokyo'
+default_password_lifetime = 0
+default-storage-engine = INNODB
+collation-server = utf8mb4_unicode_ci
+init-connect = SET NAMES utf8mb4
+explicit_defaults_for_timestamp
+datadir = /var/lib/mysql
+socket = /var/lib/mysql/mysql.sock
+symbolic-links = 0
+log-error = /var/log/mysqld.log
+pid-file = /var/run/mysqld/mysqld.pid
+
+# for cacti 1.1.X
+#   see.
+#     https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html
+#     http://enog.jp/wp-content/uploads/2017/08/enog46_toyama_cacti.pdf
+max_heap_table_size = 256M
+max_allowed_packet = 16777216
+tmp_table_size = 64M
+join_buffer_size = 64M
+innodb_file_per_table = ON
+innodb_buffer_pool_size = 1024M
+innodb_doublewrite = OFF
+innodb_flush_log_at_timeout = 3
+innodb_read_io_threads = 32
+innodb_write_io_threads = 16
+innodb_large_prefix = ON
+innodb_file_format = Barracuda
+innodb_file_format_max = Barracuda
+# Removed Parameter on mysql 5.7.4, see. https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_additional_mem_pool_size
+#  innodb_additional_mem_pool_size = 80M
+
+[mysqldump]
+default-character-set=utf8mb4
+
+[mysql]
+default-character-set=utf8mb4

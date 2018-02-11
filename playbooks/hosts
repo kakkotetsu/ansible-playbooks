@@ -1,5 +1,19 @@
 all:
+  hosts:
+    cent01:
+    cent02:
+    cent03:
   children:
+    rsyslog:
+      hosts:
+        cent01:
+    syslog-ng-servers:
+      hosts:
+        cent02:
+        cent03:
+    cacti-servers:
+      hosts:
+        cent02:
     repo_syslog-ng:
       hosts:
         cent03:

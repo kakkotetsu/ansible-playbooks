@@ -1,0 +1,79 @@
+#
+# compile & make & make install rrdtool from source
+# CentOS yum repository version is 1.4.8 ...
+#
+# see.
+#   https://oss.oetiker.ch/rrdtool/doc/rrdbuild.en.html
+#   https://oss.oetiker.ch/rrdtool/index.en.html
+#   https://github.com/oetiker/rrdtool-1.x
+#
+
+- name: yum install dependencies to make rrdtool
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - zlib-devel
+    - libpng-devel
+    - freetype
+    - freetype-devel
+    - cairo-devel
+    - pango-devel
+    - libxml2-devel
+    - python-devel
+    - perl-ExtUtils-MakeMaker
+  tags:
+    - cacti
+    - rrdtool
+
+- name: check {{ rrdtool_install_version }} installed?
+  become: true
+  become_user: root
+  command: 'bash -lc "rrdtool --help | grep -Eo \"^RRDtool [0-9\.]+\" | grep -Eo \"[0-9\.]+\""'
+  register: rrdtool_installed_version
+  changed_when: false
+  failed_when: false # e.x.) rc=127 when not installed
+  tags:
+    - cacti
+    - rrdtool
+
+- name: debug installed version
+  debug: var=rrdtool_installed_version
+  tags:
+    - cacti
+    - rrdtool
+
+#
+# see.
+#   https://oss.oetiker.ch/rrdtool/pub/?M=D
+#
+- name: download and unarchive rrdtool {{ rrdtool_install_version }} tar.gz
+  become: true
+  become_user: root
+  unarchive:
+    src: https://oss.oetiker.ch/rrdtool/pub/rrdtool-{{ rrdtool_install_version }}.tar.gz
+    dest: /var/tmp
+    remote_src: yes
+  when: (rrdtool_installed_version.rc == 2) or (rrdtool_installed_version.stdout != rrdtool_install_version)
+  tags:
+    - cacti
+    - rrdtool
+
+- name: configure, make, make install rrdtool {{ rrdtool_install_version }} tar.gz
+  become: true
+  become_user: root
+  shell: |
+    cd /var/tmp/rrdtool-'{{ rrdtool_install_version }}'
+    ./configure
+    make clean
+    make
+    make install
+  notify:
+    - add PATH
+  when: (rrdtool_installed_version.rc == 2) or (rrdtool_installed_version.stdout != rrdtool_install_version)
+  tags:
+    - cacti
+    - rrdtool
+

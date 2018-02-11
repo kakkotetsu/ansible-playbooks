@@ -1,0 +1,9 @@
+- name: add PATH
+  become: true
+  become_user: root
+  template:
+    src: rrdtool.sh.j2
+    dest: /etc/profile.d/rrdtool.sh
+    owner: root
+    group: root
+    mode: 0644
