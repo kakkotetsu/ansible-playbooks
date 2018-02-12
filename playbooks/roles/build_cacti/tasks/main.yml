@@ -12,17 +12,53 @@
   tags:
     - cacti
 
-#- name: copy /etc/php.ini
-#  become: true
-#  become_user: root
-#  template:
-#    src: php.ini.j2
-#    dest: /etc/php.ini
-#    owner: root
-#    group: root
-#    mode: 0644
-#  notify:
-#    - restart httpd
-#  tags:
-#    - php
+# mysql cactiuser config
+#
+- name: copy /var/tmp/my.cnf
+  become: true
+  become_user: root
+  template:
+    src: my.cnf.j2
+    dest: /var/tmp/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cacti
+
+# check if cacti tables exist?
+- name: check mysql tables at cacti database
+  become: true
+  become_user: root
+  shell: mysql --defaults-extra-file=/var/tmp/my.cnf -e "show tables from cacti;" | grep -Eo "snmpagent_mibs"
+  register: mysql_cacti_tables
+  changed_when: false
+  failed_when: false
+  tags:
+    - cacti
+
+- name: debug
+  debug: var=mysql_cacti_tables
+  tags:
+    - cacti
+
+- name: exec /usr/share/doc/cacti-{{ cacti_install_version }}/cacti.sql on mysql
+  become: true
+  become_user: root
+  shell: mysql --defaults-extra-file=/var/tmp/my.cnf cacti < /usr/share/doc/cacti-{{ cacti_install_version }}/cacti.sql
+  when: (mysql_cacti_tables.rc != 0 ) or (mysql_cacti_tables.stdout != "snmpagent_mibs")
+  tags:
+    - cacti
+
+- name: copy /etc/cacti/db.php
+  become: true
+  become_user: root
+  template:
+    src: db.php.j2
+    dest: /etc/cacti/db.php
+    owner: cacti
+    group: apache
+    mode: 0640
+  tags:
+    - cacti
 
