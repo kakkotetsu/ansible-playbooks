@@ -1,0 +1,44 @@
+- name: yum repository Remi for PHP
+  become: true
+  become_user: root
+  yum:
+    name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+    state: installed
+  tags:
+    - php
+
+- name: yum install PHP 5.6 packages
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    enablerepo: remi-php56
+    state: installed
+  with_items:
+    - php
+    - php-devel
+    - php-common
+    - php-pear
+    - php-gd
+    - php-dbg
+    - php-mbstring
+    - php-cli
+    - php-mysqlnd
+    - php-snmp
+  tags:
+    - php
+
+- name: copy /etc/php.ini
+  become: true
+  become_user: root
+  template:
+    src: php.ini.j2
+    dest: /etc/php.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart httpd
+  tags:
+    - php
+

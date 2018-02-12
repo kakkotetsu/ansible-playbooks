@@ -1,0 +1,38 @@
+- name: yum install httpd, httpd-devel
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - httpd
+    - httpd-devel
+  tags:
+    - cacti
+    - httpd
+
+- name: copy /etc/httpd/conf.d/cacti.conf
+  become: true
+  become_user: root
+  template:
+    src: cacti.conf.j2
+    dest: /etc/httpd/conf.d/cacti.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart httpd
+  tags:
+    - cacti
+    - httpd
+
+- name: systemctl enable,start httpd
+  become: true
+  become_user: root
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  tags:
+    - cacti
+    - httpd

@@ -15,3 +15,12 @@
   remote_user: kotetsu
   roles:
     - build_rrdtool
+
+- name: install others
+  hosts: cacti-servers
+  remote_user: kotetsu
+  roles:
+    - build_apache
+    - build_php
+    - build_snmpd
+
