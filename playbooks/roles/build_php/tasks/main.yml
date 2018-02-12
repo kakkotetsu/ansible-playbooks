@@ -7,6 +7,72 @@
   tags:
     - php
 
+#
+# pst (may be...) :
+#   
+#   # php -v
+#   PHP 5.6.33 (cli) (built: Jan  3 2018 13:02:21)
+#   Copyright (c) 1997-2016 The PHP Group
+#   Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
+#
+#   # php -m
+#   [PHP Modules]
+#   bz2
+#   calendar
+#   Core
+#   ctype
+#   curl
+#   date
+#   dom
+#   ereg
+#   exif
+#   fileinfo
+#   filter
+#   ftp
+#   gd
+#   gettext
+#   hash
+#   iconv
+#   json
+#   ldap
+#   libxml
+#   mbstring
+#   mhash
+#   mysql
+#   mysqli
+#   mysqlnd
+#   openssl
+#   pcntl
+#   pcre
+#   PDO
+#   pdo_mysql
+#   pdo_sqlite
+#   Phar
+#   posix
+#   readline
+#   Reflection
+#   session
+#   shmop
+#   SimpleXML
+#   snmp
+#   sockets
+#   SPL
+#   sqlite3
+#   standard
+#   sysvmsg
+#   sysvsem
+#   sysvshm
+#   tokenizer
+#   wddx
+#   xml
+#   xmlreader
+#   xmlwriter
+#   xsl
+#   zip
+#   zlib
+#
+#   [Zend Modules]
+#
 - name: yum install PHP 5.6 packages
   become: true
   become_user: root
@@ -25,6 +91,7 @@
     - php-cli
     - php-mysqlnd
     - php-snmp
+    - php-ldap
   tags:
     - php
 
