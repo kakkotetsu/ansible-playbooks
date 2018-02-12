@@ -24,3 +24,9 @@
     - build_php
     - build_snmpd
 
+- name: install and configuration cacti
+  hosts: cacti-servers
+  remote_user: kotetsu
+  roles:
+    - build_cacti
+

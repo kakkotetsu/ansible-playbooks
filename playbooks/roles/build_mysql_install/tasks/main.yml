@@ -13,8 +13,7 @@
     name: mariadb-libs
     state: removed
   tags:
-    - cacti
-    - db
+    - mysql
 
 # see.
 #   https://dev.mysql.com/downloads/repo/yum/
@@ -26,8 +25,7 @@
     name: http://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
     state: installed
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: yum install mysql, MySQL-python
   become: true
@@ -40,8 +38,7 @@
     - mysql-community-server
     - MySQL-python
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: systemctl enable,start mysql
   become: true
@@ -51,8 +48,7 @@
     state: started
     enabled: yes
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: get temporary root password
   become: true
@@ -61,8 +57,7 @@
   register: mysql_default_password
   changed_when: false
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: deploy /root/.my.cnf
   become: true
@@ -76,8 +71,7 @@
   notify:
     - restart mysqld
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: deploy /etc/my.cnf
   become: true
@@ -91,8 +85,7 @@
   notify:
     - restart mysqld
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: check mysql root password is temporary?
   become: true
@@ -102,8 +95,7 @@
   changed_when: false
   failed_when: false
   tags:
-    - cacti
-    - db
+    - mysql
 
 - name: set mysql root password
   become: true
@@ -114,8 +106,7 @@
     mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
   when: root_check.stderr.find('denied') == -1
   tags:
-    - cacti
-    - db
+    - mysql
 
 # see.
 #   https://forums.cacti.net/viewtopic.php?f=21&t=56848
@@ -127,8 +118,7 @@
   register: time_zone_check
   changed_when: false
   tags:
-    - cacti
-    - db
+    - mysql
 
 # see.
 #   https://forums.cacti.net/viewtopic.php?f=21&t=56848
@@ -139,6 +129,5 @@
   shell: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   when: time_zone_check.stdout != "Asia/Tokyo"
   tags:
-    - cacti
-    - db
+    - mysql
 

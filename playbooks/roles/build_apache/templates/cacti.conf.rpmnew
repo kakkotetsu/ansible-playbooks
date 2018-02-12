@@ -1,13 +1,19 @@
 #
-# for cacti
-# apache 2.4
+# Cacti: An rrd based graphing tool
 #
+
+# For security reasons, the Cacti web interface is accessible only to
+# localhost in the default configuration. If you want to allow other clients
+# to access your Cacti installation, change the httpd ACLs below.
+# For example:
+# On httpd 2.4, change "Require host localhost" to "Require all granted".
+# On httpd 2.2, change "Allow from localhost" to "Allow from all".
+
 Alias /cacti    /usr/share/cacti
 
 <Directory /usr/share/cacti/>
 	<IfModule mod_authz_core.c>
 		# httpd 2.4
-		#Require host localhost
 		Require all granted
 	</IfModule>
 	<IfModule !mod_authz_core.c>
@@ -27,6 +33,9 @@ Alias /cacti    /usr/share/cacti
 	#SecRuleRemoveById 900011
 </Directory>
 
+# These sections marked "Require all denied" (or "Deny from all")
+# should not be modified.
+# These are in place in order to harden Cacti.
 <Directory /usr/share/cacti/log>
 	<IfModule mod_authz_core.c>
 		Require all denied

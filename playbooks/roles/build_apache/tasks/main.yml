@@ -8,7 +8,6 @@
     - httpd
     - httpd-devel
   tags:
-    - cacti
     - httpd
 
 - name: copy /etc/httpd/conf.d/cacti.conf
@@ -23,7 +22,6 @@
   notify:
     - restart httpd
   tags:
-    - cacti
     - httpd
 
 - name: systemctl enable,start httpd
@@ -34,5 +32,4 @@
     state: started
     enabled: yes
   tags:
-    - cacti
     - httpd

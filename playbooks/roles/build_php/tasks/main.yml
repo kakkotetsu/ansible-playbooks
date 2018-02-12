@@ -92,6 +92,8 @@
     - php-mysqlnd
     - php-snmp
     - php-ldap
+    - php-intl
+    - php-imap
   tags:
     - php
 

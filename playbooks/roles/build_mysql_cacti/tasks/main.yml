@@ -26,7 +26,6 @@
     state: present
     encoding: utf8mb4
   tags:
-    - cacti
     - db
 
 
@@ -51,6 +50,5 @@
     priv: 'cacti.*:ALL,GRANT/mysql.time_zone_name:SELECT'
     state: present
   tags:
-    - cacti
     - db
 

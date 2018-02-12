@@ -25,7 +25,6 @@
     - python-devel
     - perl-ExtUtils-MakeMaker
   tags:
-    - cacti
     - rrdtool
 
 - name: check {{ rrdtool_install_version }} installed?
@@ -42,7 +41,6 @@
 - name: debug installed version
   debug: var=rrdtool_installed_version
   tags:
-    - cacti
     - rrdtool
 
 #
@@ -58,7 +56,6 @@
     remote_src: yes
   when: (rrdtool_installed_version.rc == 2) or (rrdtool_installed_version.stdout != rrdtool_install_version)
   tags:
-    - cacti
     - rrdtool
 
 - name: configure, make, make install rrdtool {{ rrdtool_install_version }} tar.gz
@@ -74,6 +71,5 @@
     - add PATH
   when: (rrdtool_installed_version.rc == 2) or (rrdtool_installed_version.stdout != rrdtool_install_version)
   tags:
-    - cacti
     - rrdtool
 
