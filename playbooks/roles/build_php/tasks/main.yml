@@ -94,6 +94,7 @@
     - php-ldap
     - php-intl
     - php-imap
+    - php-gmp
   tags:
     - php
 
