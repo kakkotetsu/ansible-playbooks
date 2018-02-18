@@ -1,14 +1,16 @@
 #
-# Cacti 1.1.34
+# Cacti 
+#   - 2018/02/12 : 1.1.34
+#   - 2018/02/19 : 1.1.35
 #
 
-- name: yum install cacti --enablerepo=epel-testing (cacti 1.1.34 at 20180212)
+- name: yum install cacti --enablerepo=epel-testing (cacti latest)
   become: true
   become_user: root
   yum:
     name: cacti
     enablerepo: epel-testing
-    state: installed
+    state: latest #installed
   tags:
     - cacti
 
