@@ -1,0 +1,14 @@
+# see. https://httpd.apache.org/docs/2.4/en/vhosts/name-based.html
+<VirtualHost *:80>
+  DocumentRoot /var/www/html/
+  ServerName {{ apache_vh_servername }}
+  ServerAlias {{ apache_vh_serveralias }}
+  <Directory /var/www/html/cacti/>
+    Options FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    allow from all
+  </Directory>
+  ErrorLog /var/log/httpd/cacti-error_log
+  CustomLog /var/log/httpd/cacti-access_log common
+</VirtualHost>

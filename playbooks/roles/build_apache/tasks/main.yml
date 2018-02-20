@@ -10,12 +10,12 @@
   tags:
     - httpd
 
-- name: copy /etc/httpd/conf.d/cacti.conf
+- name: copy /etc/httpd/conf/httpd.conf
   become: true
   become_user: root
   template:
-    src: cacti.conf.j2
-    dest: /etc/httpd/conf.d/cacti.conf
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
     owner: root
     group: root
     mode: 0644
