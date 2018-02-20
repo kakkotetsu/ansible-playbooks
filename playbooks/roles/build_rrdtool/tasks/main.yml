@@ -35,7 +35,6 @@
   changed_when: false
   failed_when: false # e.x.) rc=127 when not installed
   tags:
-    - cacti
     - rrdtool
 
 - name: debug installed version

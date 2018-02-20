@@ -4,15 +4,68 @@
 #   - 2018/02/19 : 1.1.35
 #
 
-- name: yum install cacti --enablerepo=epel-testing (cacti latest)
+#- name: yum install cacti --enablerepo=epel-testing (cacti latest)
+#  become: true
+#  become_user: root
+#  yum:
+#    name: cacti
+#    enablerepo: epel-testing
+#    state: latest #installed
+#  tags:
+#    - cacti
+
+- name: check cacti {{ cacti_install_version }} installed?
   become: true
   become_user: root
-  yum:
-    name: cacti
-    enablerepo: epel-testing
-    state: latest #installed
+  stat:
+    path: '{{ cacti_install_directory }}/cacti-{{ cacti_install_version }}'
+  register: cacti_directory
   tags:
     - cacti
+    - cacti-source
+
+- name: download and unarchive cacti {{ cacti_install_version }} tar.gz
+  become: true
+  become_user: root
+  unarchive:
+    src: https://www.cacti.net/downloads/cacti-{{ cacti_install_version }}.tar.gz
+    dest: '{{ cacti_install_directory }}'
+    remote_src: yes
+    owner: apache
+    group: apache
+  when: cacti_directory.stat.islnk is not defined
+  tags:
+    - cacti
+    - cacti-source
+
+- name: ln -s {{ cacti_install_directory }}/cacti-{{ cacti_install_version }} /var/www/html/cacti
+  become: true
+  become_user: root
+  file:
+    src: '{{ cacti_install_directory }}/cacti-{{ cacti_install_version }}'
+    dest: '/var/www/html/cacti'
+    state: link
+    owner: apache
+    group: apache
+  #when: cacti_directory.stat.islnk is not defined
+  tags:
+    - cacti
+    - cacti-source
+
+- name: copy /etc/httpd/conf.d/cacti.conf
+  become: true
+  become_user: root
+  template:
+    src: httpd_cacti.conf.j2
+    dest: /etc/httpd/conf.d/cacti.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart httpd
+  tags:
+    - cacti
+    - cacti-source
 
 # mysql cactiuser config
 #
@@ -44,23 +97,36 @@
   tags:
     - cacti
 
-- name: exec /usr/share/doc/cacti-{{ cacti_install_version }}/cacti.sql on mysql
+- name: exec {{ cacti_install_directory}}/cacti-{{ cacti_install_version }}/cacti.sql on mysql
   become: true
   become_user: root
-  shell: mysql --defaults-extra-file=/var/tmp/my.cnf cacti < /usr/share/doc/cacti-{{ cacti_install_version }}/cacti.sql
+  shell: mysql --defaults-extra-file=/var/tmp/my.cnf cacti < {{ cacti_install_directory }}/cacti-{{ cacti_install_version }}/cacti.sql
   when: (mysql_cacti_tables.rc != 0 ) or (mysql_cacti_tables.stdout != "snmpagent_mibs")
   tags:
     - cacti
 
-- name: copy /etc/cacti/db.php
+# for yum installed cacti
+#- name: copy /etc/cacti/db.php
+#  become: true
+#  become_user: root
+#  template:
+#    src: db.php.j2
+#    dest: /etc/cacti/db.php
+#    owner: cacti
+#    group: apache
+#    mode: 0640
+#  tags:
+#    - cacti
+
+- name: copy {{ cacti_install_directory }}/cacti-{{ cacti_install_version }}/include/config.php
   become: true
   become_user: root
   template:
     src: db.php.j2
-    dest: /etc/cacti/db.php
-    owner: cacti
+    dest: '{{ cacti_install_directory }}/cacti-{{ cacti_install_version }}/include/config.php'
+    owner: apache
     group: apache
-    mode: 0640
+    mode: 0664
   tags:
     - cacti
-
+    - cacti-source
