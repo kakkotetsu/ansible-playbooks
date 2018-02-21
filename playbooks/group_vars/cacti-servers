@@ -1,6 +1,7 @@
 rrdtool_install_version: "1.6.0"
 cacti_install_version: "1.1.35"
 cacti_install_directory: "/var/data"
+cacti_spine_install_version: "1.1.35"
 apache_vh_servername: "10.0.0.130"
 apache_vh_serveralias: "www.10.0.0.130"
 

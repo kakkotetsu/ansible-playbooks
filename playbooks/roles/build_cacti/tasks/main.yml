@@ -130,3 +130,75 @@
   tags:
     - cacti
     - cacti-source
+
+- name: check {{ cacti_spine_install_version }} installed? at /usr/local/spine/bin/spine
+  become: true
+  become_user: root
+  command: 'bash -lc "/usr/local/spine/bin/spine --help | grep -Eo \"^SPINE [0-9\.]+\" | grep -Eo \"[0-9\.]+\""'
+  register: spine_installed_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - cacti
+    - cacti-spine
+
+- name: debug installed version
+  debug: var=spine_installed_version
+  tags:
+    - cacti
+    - cacti-spine
+
+- name: yum install dependencies to make cacti spine
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - net-snmp-devel
+    - help2man
+  tags:
+    - cacti
+    #- cacti-spine
+
+# see.
+#   https://www.cacti.net/spine_download.php
+#
+- name: download and unarchive cacti spine {{ cacti_spine_install_version }} tar.gz
+  become: true
+  become_user: root
+  unarchive:
+    src: https://www.cacti.net/downloads/spine/cacti-spine-{{ cacti_spine_install_version }}.tar.gz
+    dest: /var/tmp
+    remote_src: yes
+  when: (spine_installed_version.rc != 0) or (spine_installed_version.stdout != cacti_spine_install_version)
+  tags:
+    - cacti
+    - cacti-spine
+
+- name: configure, make, make install cacti spine {{ cacti_spine_install_version }} tar.gz
+  become: true
+  become_user: root
+  shell: |
+    cd /var/tmp/cacti-spine-'{{ cacti_spine_install_version }}'
+    ./configure
+    make clean
+    make
+    make install
+  when: (spine_installed_version.rc != 0) or (spine_installed_version.stdout != cacti_spine_install_version)
+  tags:
+    - cacti
+    - cacti-spine
+
+- name: copy /usr/local/spine/etc/spine.conf
+  become: true
+  become_user: root
+  template:
+    src: spine.conf.j2
+    dest: /usr/local/spine/etc/spine.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cacti
+    - cacti-spine

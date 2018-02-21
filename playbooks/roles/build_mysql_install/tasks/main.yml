@@ -36,7 +36,8 @@
     state: installed
   with_items:
     - mysql-community-server
-    - MySQL-python
+    - MySQL-python            # for Ansible
+    - mysql-community-devel   # for cacti spine configure
   tags:
     - mysql
 
