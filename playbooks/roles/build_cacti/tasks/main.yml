@@ -202,3 +202,16 @@
   tags:
     - cacti
     - cacti-spine
+
+- name: copy /etc/cron.d/cacti
+  become: true
+  become_user: root
+  template:
+    src: etc_cron.d_cacti.j2
+    dest: /etc/cron.d/cacti
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cacti
+
